@@ -2236,99 +2236,159 @@
 },{}],2:[function(require,module,exports){
 'use strict';
 
-var _mithril = require('./mithril');
+var m = require('mithril');
 
-var _mithril2 = _interopRequireDefault(_mithril);
-
-function _interopRequireDefault(obj) { return obj && obj.__esModule ? obj : { default: obj }; }
-
-//カウンター
-var counter = 0;
-
-//タイマーでカウントアップ
-setInterval(function () {
-	counter++;
-	_mithril2.default.redraw(true);
-}, 1000);
-
-//ビュー
-function view() {
-	return {
-		tag: 'a',
-		children: ['count: ', counter],
-		attrs: { href: '#' }
-	};
-}
+var Top = require('./component/top');
 
 //HTML要素にコンポーネントをマウント
-_mithril2.default.mount(document.body, { view: view });
-},{"./mithril":3}],3:[function(require,module,exports){
+m.route(document.getElementById("root"), "/", {
+	"/": Top
+});
+},{"./component/top":3,"mithril":1}],3:[function(require,module,exports){
 'use strict';
-
-/*********************************************
- * mithril フレームワークを拡張する
- *********************************************/
-
-// クライアントのバージョン番号
-
-var version = 1;
 
 var m = require('mithril');
 
-/*********************************************
- * m.request 拡張
- *********************************************/
+var Controller = require('../controller/top');
+var View = require('../view/top');
 
-// 上書き前の m.request
-var request = m.request;
+module.exports = {
+	controller: Controller,
+	view: View
+};
+},{"../controller/top":4,"../view/top":5,"mithril":1}],4:[function(require,module,exports){
+'use strict';
 
-// サーバから取得したデータを parse する関数
-var unwrapSuccess = function unwrapSuccess(res) {
-	// status が success でなければ
-	if (res.status !== 'success') {
-		throw new Error(res.error_code);
-	}
+var m = require('mithril');
 
-	// 新しいAPIのバージョンがリリースされてれば
-	if (res.version > version) {
-		throw new Error();
-	}
+var Controller = function Controller() {
+	var self = this;
 
-	// response の中身がサーバから受け取るデータの本質
-	return res.response;
+	// Canvas
+	self.ctx = null;
+
+	// Canvas 初期化時の route
+	self.init_route = null;
+
+	// requrestAnimationFrame のキャンセル用
+	self.requestID = null;
+
+	// 画像の読み込みがすべて完了したかどうか
+	self.is_image_loaded = false;
+};
+Controller.prototype.initCanvas = function (elm, context) {
+	var self = this;
+	self.ctx = elm.getContext('2d');
+	self.init_route = m.route();
+
+	var img = new Image();
+	img.src = "./img/haikyo.jpg";
+	img.onload = function () {
+		self.ctx.drawImage(img, 0, 0);
+	};
+	var img2 = new Image();
+	img2.src = "./img/chara/ikari.png";
+	img2.onload = function () {
+		self.ctx.drawImage(img2, 0, -150, this.width, this.height, 0, 0, this.width * 0.5, this.height * 0.5);
+	};
+
+	self.updateCanvas();
 };
 
-// m.request を上書き
-m.request = function (args) {
-	// ローディング画面
-	var loaders = document.querySelectorAll(".loader");
+Controller.prototype.updateCanvas = function () {
+	var self = this;
 
-	// サーバと通信中はローディング画面を表示
-	for (var i = 0; i < loaders.length; i++) {
-		loaders[i].style.display = "block";
+	if (self.is_image_loaded) {
+		console.log('image done');
 	}
 
-	// サーバから取得したデータを parse
-	if (!args.unwrapSuccess) {
-		args.unwrapSuccess = unwrapSuccess;
-	}
-
-	return request(args).then(function (value) {
-		// 通信成功後はローディング画面を隠す
-		for (var i = 0; i < loaders.length; i++) {
-			loaders[i].style.display = "none";
-		}
-		return value;
-	}, function (error) {
-		// 通信失敗時はローディング画面を隠す
-		for (var i = 0; i < loaders.length; i++) {
-			loaders[i].style.display = "none";
-		}
-
-		// エラー画面に遷移
-		m.route('/error');
-	});
+	self.requestID = requestAnimationFrame(self.updateCanvas.bind(self));
 };
+Controller.prototype.onunload = function (e) {
+	if (this.requestID !== null) {
+		cancelAnimationFrame(this.requestID);
+		this.requestID = null;
+	}
+};
+module.exports = Controller;
+},{"mithril":1}],5:[function(require,module,exports){
+'use strict';
 
-module.exports = m;
-},{"mithril":1}]},{},[2]);
+module.exports = function (ctrl) {
+	return {
+		tag: "div",
+		children: [{
+			tag: "nav",
+			children: [{
+				tag: "div",
+				children: [{
+					tag: "div",
+					children: [{
+						tag: "span",
+						children: ["こいしちゃんを監禁する"],
+						attrs: { className: "navbar-brand" }
+					}],
+					attrs: { className: "navbar-header" }
+				}],
+				attrs: { className: "container-fluid" }
+			}],
+			attrs: { className: "navbar navbar-inverse navbar-fixed-top" }
+		}, {
+			tag: "div",
+			children: [{
+				tag: "div",
+				children: [{
+					tag: "canvas",
+					attrs: { id: "main", width: "320", height: "320", style: "border:1px solid black; width:320px; height:320px;", config: function config(elm, isInitialized, context) {
+							if (!isInitialized) {
+								ctrl.initCanvas(elm, context);
+							}
+						} }
+				}],
+				attrs: { className: "row" }
+			}, {
+				tag: "div",
+				children: [{
+					tag: "div",
+					children: [{
+						tag: "div",
+						children: ["こいし"],
+						attrs: { className: "panel-heading" }
+					}, {
+						tag: "div",
+						children: ["・・・・・"],
+						attrs: { className: "panel-body" }
+					}],
+					attrs: { className: "panel panel-success" }
+				}],
+				attrs: { className: "row" }
+			}, {
+				tag: "div",
+				children: [{
+					tag: "div",
+					children: [{
+						tag: "div",
+						children: [{
+							tag: "button",
+							children: ["ご飯"],
+							attrs: { type: "button", className: "btn btn-warning btn-lg" }
+						}, {
+							tag: "button",
+							children: ["会話"],
+							attrs: { type: "button", className: "btn btn-info btn-lg" }
+						}, {
+							tag: "button",
+							children: ["見つめる"],
+							attrs: { type: "button", className: "btn btn-primary btn-lg" }
+						}],
+						attrs: { className: "panel-body" }
+					}],
+					attrs: { className: "panel panel-default" }
+				}],
+				attrs: { className: "row" }
+			}],
+			attrs: { className: "container-fluid", style: "padding-top:80px" }
+		}]
+	};
+};
+},{}]},{},[2]);
