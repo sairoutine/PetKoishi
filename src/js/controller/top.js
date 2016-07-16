@@ -88,6 +88,9 @@ Controller.prototype.ontalk = function() {
 	var self = this;
 
 	return function(e) {
+		// 親愛度が上昇
+		self.character.love++;
+
 		self.face = "chara_naku";
 		self.serif = "おねえちゃんのところに帰してよう・・・";
 	};
