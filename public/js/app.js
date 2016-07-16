@@ -2358,6 +2358,9 @@ Controller.prototype.ontalk = function () {
 	var self = this;
 
 	return function (e) {
+		// 親愛度が上昇
+		self.character.love++;
+
 		self.face = "chara_naku";
 		self.serif = "おねえちゃんのところに帰してよう・・・";
 	};
@@ -2374,7 +2377,12 @@ module.exports = Controller;
 },{"../config":4,"../model/character":6,"mithril":1}],6:[function(require,module,exports){
 'use strict';
 
-var Model = function Model() {};
+var Model = function Model() {
+	var self = this;
+
+	// 親愛度
+	self.love = 0;
+};
 module.exports = Model;
 },{}],7:[function(require,module,exports){
 'use strict';
