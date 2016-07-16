@@ -21,6 +21,12 @@ var Controller = function() {
 	// 読み込んだ画像数
 	self.loaded_image_num = 0;
 
+	// 名前
+	self.name = "こいし";
+	// セリフ
+	self.serif = "・・・・・・";
+
+	// 画像のプリロード開始
 	self._load_images();
 };
 Controller.prototype._load_images = function() {
