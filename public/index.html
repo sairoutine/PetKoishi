@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
 <head>
-	<title>こいしちゃんをペットにする</title>
+	<title>こいしちゃんを監禁する</title>
 	<link rel="stylesheet" type="text/css" href="./css/bootstrap.min.css">
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
 	<script src="https://cdnjs.cloudflare.com/ajax/libs/es5-shim/4.0.3/es5-shim.min.js"></script>
@@ -23,25 +23,29 @@
 		margin-left: -24px; /* half of width */
 		z-index: 10000;
 	}
+	.panel {
+		margin-bottom: 0px;
+	}
 	</style>
 </head>
 <body>
 	<div id="root"></div>
 
-	<div>
-		<nav class="navbar navbar-inverse navbar-fixed-top">
-			<div class="container-fluid">
-				<div class="navbar-header">
-					<span class="navbar-brand">こいしちゃんを監禁する</span>
-				</div>
+	<nav class="navbar navbar-inverse navbar-fixed-top">
+		<div class="container-fluid">
+			<div class="navbar-header">
+				<span class="navbar-brand">こいしちゃんを監禁する</span>
 			</div>
-		</nav>
-	</div>
+		</div>
+	</nav>
+
 	<div class="container-fluid" style="padding-top:80px">
 		<div class="row">
 			<canvas id="main" width="320" height="320" style="border:1px solid black; width:320px; height:320px;">
 		<!--data-toggle="popover" container="body" title="こいし" data-content="・・・・・" data-placement="bottom" class="serif">-->
 			</canvas>
+		</div>
+		<div class="row">
 			<div class="panel panel-success">
 				<div class="panel-heading">
 					こいし
@@ -50,7 +54,13 @@
 					・・・・・
 				</div>
 			</div>
-			<button type="button" class="btn btn-warning btn-lg">ご飯</button><button type="button" class="btn btn-info btn-lg">会話</button><button type="button" class="btn btn-primary btn-lg">見つめる</button>
+		</div>
+		<div class="row">
+			<div class="panel panel-default">
+				<div class="panel-body">
+					<button type="button" class="btn btn-warning btn-lg">ご飯</button><button type="button" class="btn btn-info btn-lg">会話</button><button type="button" class="btn btn-primary btn-lg">見つめる</button>
+				</div>
+			</div>
 		</div>
 	</div>
 
