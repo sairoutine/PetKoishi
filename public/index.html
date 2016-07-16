@@ -31,42 +31,6 @@
 <body>
 	<div id="root"></div>
 
-	<script>
-	onload = function() {
-		draw();
-	};
-	function draw() {
-		var canvas = document.getElementById('main');
-		if ( ! canvas || ! canvas.getContext ) { return false; }
-		var ctx = canvas.getContext('2d');
-
-		/* Imageオブジェクトを生成 */
-		var img = new Image();
-		img.src = "./img/haikyo.jpg";
-		/* 画像が読み込まれるのを待ってから処理を続行 */
-		img.onload = function() {
-			ctx.drawImage(img,
-				0,
-				0
-			);
-
-		}
-
-		/* Imageオブジェクトを生成 */
-		var img2 = new Image();
-		img2.src = "./img/chara/ikari.png";
-		/* 画像が読み込まれるのを待ってから処理を続行 */
-		img2.onload = function() {
-			ctx.drawImage(img2, 0, -150, this.width, this.height, 0, 0, this.width * 0.5, this.height * 0.5);
-
-		}
-
-	}
-
-
-	</script>
-
-
 	<div class="loader">
 		<div class="panel panel-default">
 			<div class="panel-body">

@@ -11,7 +11,11 @@ module.exports = function(ctrl) {
 
 		<div class="container-fluid" style="padding-top:80px">
 			<div class="row">
-				<canvas id="main" width="320" height="320" style="border:1px solid black; width:320px; height:320px;"></canvas>
+			<canvas id="main" width="320" height="320" style="border:1px solid black; width:320px; height:320px;" config={ function(elm, isInitialized, context) {
+				if(!isInitialized) {
+					ctrl.initCanvas(elm, context);
+				}
+			} }></canvas>
 			</div>
 			<div class="row">
 				<div class="panel panel-success">
