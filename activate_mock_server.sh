@@ -5,4 +5,4 @@
 DIR=$(cd $(dirname $0); pwd)
 
 cd $DIR/public
-$DIR/node_modules/easymock/bin/easymock
+$DIR/node_modules/http-server/bin/http-server -p3000
