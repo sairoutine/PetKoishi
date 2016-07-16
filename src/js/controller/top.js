@@ -9,6 +9,12 @@ var Controller = function() {
 
 	// Canvas 初期化時の route
 	self.init_route = null;
+
+	// requrestAnimationFrame のキャンセル用
+	self.requestID = null;
+
+	// 画像の読み込みがすべて完了したかどうか
+	self.is_image_loaded = false;
 };
 Controller.prototype.initCanvas = function(elm, context) {
 	var self = this;
@@ -38,10 +44,16 @@ Controller.prototype.initCanvas = function(elm, context) {
 Controller.prototype.updateCanvas = function () {
 	var self = this;
 
-	// ページを離れたら再描画しない
-	if (self.init_route === m.route()) {
-		requestAnimationFrame(self.updateCanvas.bind(self));
+	if(self.is_image_loaded) {
+		console.log('image done');
+	}
+
+	self.requestID = requestAnimationFrame(self.updateCanvas.bind(self));
+}
+Controller.prototype.onunload = function(e) {
+	if(this.requestID !== null) {
+		cancelAnimationFrame(this.requestID);
+		this.requestID = null;
 	}
 }
-
 module.exports = Controller;
