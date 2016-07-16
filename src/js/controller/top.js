@@ -39,24 +39,6 @@ Controller.prototype._load_images = function() {
 Controller.prototype.initCanvas = function(elm, context) {
 	var self = this;
 	self.ctx = elm.getContext('2d');
-	self.init_route = m.route();
-
-	var img = new Image();
-	img.src = "./img/haikyo.jpg";
-	img.onload = function() {
-		self.ctx.drawImage(img,
-			0,
-			0
-		);
-
-	};
-	var img2 = new Image();
-	img2.src = "./img/chara/ikari.png";
-	img2.onload = function() {
-		self.ctx.drawImage(img2, 0, -150, this.width, this.height, 0, 0, this.width * 0.5, this.height * 0.5);
-
-	};
-
 
 	self.updateCanvas();
 };
@@ -66,7 +48,14 @@ Controller.prototype.updateCanvas = function () {
 
 	// 画像の読み込みがすべて完了したかどうか
 	if(self.loaded_image_num >= Object.keys(config.images).length) {
-		console.log('image done');
+		self.ctx.drawImage(self.images['bg'],
+			0,
+			0
+		);
+
+		var chara = self.images.chara_ikari;
+		self.ctx.drawImage(chara, 0, -150, chara.width, chara.height, 0, 0, chara.width * 0.5, chara.height * 0.5);
+
 	}
 
 	self.requestID = requestAnimationFrame(self.updateCanvas.bind(self));
