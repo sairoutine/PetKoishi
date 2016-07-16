@@ -30,9 +30,9 @@ module.exports = function(ctrl) {
 			<div class="row">
 				<div class="panel panel-default">
 					<div class="panel-body">
-					<button type="button" class="btn btn-warning btn-lg">ご飯</button>
-					<button type="button" class="btn btn-info btn-lg">会話</button>
-					<button type="button" class="btn btn-primary btn-lg">見つめる</button>
+					<button type="button" class="btn btn-warning btn-lg" onclick={ ctrl.onmeal() }>ご飯</button>
+					<button type="button" class="btn btn-info btn-lg" onclick={ ctrl.ontalk() }>会話</button>
+					<button type="button" class="btn btn-primary btn-lg" onclick={ ctrl.onwatch() }>見つめる</button>
 					</div>
 				</div>
 			</div>

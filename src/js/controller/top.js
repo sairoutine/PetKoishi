@@ -25,6 +25,8 @@ var Controller = function() {
 	self.name = "こいし";
 	// セリフ
 	self.serif = "・・・・・・";
+	// 表情
+	self.face = "chara_ikari";
 
 	// 画像のプリロード開始
 	self._load_images();
@@ -59,7 +61,7 @@ Controller.prototype.updateCanvas = function () {
 			0
 		);
 
-		var chara = self.images.chara_ikari;
+		var chara = self.images[self.face];
 		self.ctx.drawImage(chara, 0, -150, chara.width, chara.height, 0, 0, chara.width * 0.5, chara.height * 0.5);
 
 	}
@@ -71,5 +73,29 @@ Controller.prototype.onunload = function(e) {
 		cancelAnimationFrame(this.requestID);
 		this.requestID = null;
 	}
+};
+Controller.prototype.onmeal = function() {
+	var self = this;
+	return function(e) {
+		self.face = "chara_tsuyoki";
+		self.serif = "いらない(信用されていないようだ)";
+
+	};
+};
+Controller.prototype.ontalk = function() {
+	var self = this;
+
+	return function(e) {
+		self.face = "chara_naku";
+		self.serif = "おねえちゃんのところに帰してよう・・・";
+	};
+};
+Controller.prototype.onwatch = function() {
+	var self = this;
+
+	return function(e) {
+		self.face = "chara_komaru";
+		self.serif = "・・・・・・？(困っているようだ)";
+	};
 };
 module.exports = Controller;
