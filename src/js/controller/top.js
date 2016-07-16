@@ -1,34 +1,47 @@
 'use strict';
+var m = require('mithril');
 
 var Controller = function() {
+	var self = this;
 
+	// Canvas
+	self.ctx = null;
+
+	// Canvas 初期化時の route
+	self.init_route = null;
 };
 Controller.prototype.initCanvas = function(elm, context) {
 	var self = this;
 	self.ctx = elm.getContext('2d');
+	self.init_route = m.route();
 
-	var ctx = self.ctx;
-
-	/* Imageオブジェクトを生成 */
 	var img = new Image();
 	img.src = "./img/haikyo.jpg";
-	/* 画像が読み込まれるのを待ってから処理を続行 */
 	img.onload = function() {
-		ctx.drawImage(img,
+		self.ctx.drawImage(img,
 			0,
 			0
 		);
 
 	}
-
-	/* Imageオブジェクトを生成 */
 	var img2 = new Image();
 	img2.src = "./img/chara/ikari.png";
-	/* 画像が読み込まれるのを待ってから処理を続行 */
 	img2.onload = function() {
-		ctx.drawImage(img2, 0, -150, this.width, this.height, 0, 0, this.width * 0.5, this.height * 0.5);
+		self.ctx.drawImage(img2, 0, -150, this.width, this.height, 0, 0, this.width * 0.5, this.height * 0.5);
 
 	}
+
+
+	self.updateCanvas();
 };
+
+Controller.prototype.updateCanvas = function () {
+	var self = this;
+
+	// ページを離れたら再描画しない
+	if (self.init_route === m.route()) {
+		requestAnimationFrame(self.updateCanvas.bind(self));
+	}
+}
 
 module.exports = Controller;
