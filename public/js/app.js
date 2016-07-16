@@ -2256,10 +2256,28 @@ module.exports = {
 	controller: Controller,
 	view: View
 };
-},{"../controller/top":4,"../view/top":5,"mithril":1}],4:[function(require,module,exports){
+},{"../controller/top":5,"../view/top":7,"mithril":1}],4:[function(require,module,exports){
+'use strict';
+
+var Config = {};
+
+// ゲームに必要な画像一覧
+Config.images = {
+	bg: "./img/haikyo.jpg",
+	chara_ikari: "./img/chara/ikari.png",
+	chara_komaru: "./img/chara/komaru.png",
+	chara_naku: "./img/chara/naku.png",
+	chara_tsuyoki: "./img/chara/tsuyoki.png"
+};
+
+module.exports = Config;
+},{}],5:[function(require,module,exports){
 'use strict';
 
 var m = require('mithril');
+
+var config = require('../config');
+var Character = require('../model/character');
 
 var Controller = function Controller() {
 	var self = this;
@@ -2273,24 +2291,39 @@ var Controller = function Controller() {
 	// requrestAnimationFrame のキャンセル用
 	self.requestID = null;
 
-	// 画像の読み込みがすべて完了したかどうか
-	self.is_image_loaded = false;
+	// 読み込んだ画像一覧
+	self.images = {};
+
+	// 読み込んだ画像数
+	self.loaded_image_num = 0;
+
+	self.character = new Character();
+	// 名前
+	self.name = "こいし";
+	// セリフ
+	self.serif = "・・・・・・";
+	// 表情
+	self.face = "chara_ikari";
+
+	// 画像のプリロード開始
+	self._load_images();
+};
+Controller.prototype._load_images = function () {
+	var self = this;
+
+	var onload_function = function onload_function() {
+		self.loaded_image_num++;
+	};
+
+	for (var key in config.images) {
+		self.images[key] = new Image();
+		self.images[key].src = config.images[key];
+		self.images[key].onload = onload_function;
+	}
 };
 Controller.prototype.initCanvas = function (elm, context) {
 	var self = this;
 	self.ctx = elm.getContext('2d');
-	self.init_route = m.route();
-
-	var img = new Image();
-	img.src = "./img/haikyo.jpg";
-	img.onload = function () {
-		self.ctx.drawImage(img, 0, 0);
-	};
-	var img2 = new Image();
-	img2.src = "./img/chara/ikari.png";
-	img2.onload = function () {
-		self.ctx.drawImage(img2, 0, -150, this.width, this.height, 0, 0, this.width * 0.5, this.height * 0.5);
-	};
 
 	self.updateCanvas();
 };
@@ -2298,8 +2331,12 @@ Controller.prototype.initCanvas = function (elm, context) {
 Controller.prototype.updateCanvas = function () {
 	var self = this;
 
-	if (self.is_image_loaded) {
-		console.log('image done');
+	// 画像の読み込みがすべて完了したかどうか
+	if (self.loaded_image_num >= Object.keys(config.images).length) {
+		self.ctx.drawImage(self.images['bg'], 0, 0);
+
+		var chara = self.images[self.face];
+		self.ctx.drawImage(chara, 0, -150, chara.width, chara.height, 0, 0, chara.width * 0.5, chara.height * 0.5);
 	}
 
 	self.requestID = requestAnimationFrame(self.updateCanvas.bind(self));
@@ -2310,8 +2347,36 @@ Controller.prototype.onunload = function (e) {
 		this.requestID = null;
 	}
 };
+Controller.prototype.onmeal = function () {
+	var self = this;
+	return function (e) {
+		self.face = "chara_tsuyoki";
+		self.serif = "いらない(信用されていないようだ)";
+	};
+};
+Controller.prototype.ontalk = function () {
+	var self = this;
+
+	return function (e) {
+		self.face = "chara_naku";
+		self.serif = "おねえちゃんのところに帰してよう・・・";
+	};
+};
+Controller.prototype.onwatch = function () {
+	var self = this;
+
+	return function (e) {
+		self.face = "chara_komaru";
+		self.serif = "・・・・・・？(困っているようだ)";
+	};
+};
 module.exports = Controller;
-},{"mithril":1}],5:[function(require,module,exports){
+},{"../config":4,"../model/character":6,"mithril":1}],6:[function(require,module,exports){
+'use strict';
+
+var Model = function Model() {};
+module.exports = Model;
+},{}],7:[function(require,module,exports){
 'use strict';
 
 module.exports = function (ctrl) {
@@ -2340,9 +2405,9 @@ module.exports = function (ctrl) {
 				children: [{
 					tag: "canvas",
 					attrs: { id: "main", width: "320", height: "320", style: "border:1px solid black; width:320px; height:320px;", config: function config(elm, isInitialized, context) {
-							if (!isInitialized) {
-								ctrl.initCanvas(elm, context);
-							}
+							if (isInitialized) return;
+
+							ctrl.initCanvas(elm, context);
 						} }
 				}],
 				attrs: { className: "row" }
@@ -2352,11 +2417,11 @@ module.exports = function (ctrl) {
 					tag: "div",
 					children: [{
 						tag: "div",
-						children: ["こいし"],
+						children: [ctrl.name],
 						attrs: { className: "panel-heading" }
 					}, {
 						tag: "div",
-						children: ["・・・・・"],
+						children: [ctrl.serif],
 						attrs: { className: "panel-body" }
 					}],
 					attrs: { className: "panel panel-success" }
@@ -2371,15 +2436,15 @@ module.exports = function (ctrl) {
 						children: [{
 							tag: "button",
 							children: ["ご飯"],
-							attrs: { type: "button", className: "btn btn-warning btn-lg" }
+							attrs: { type: "button", className: "btn btn-warning btn-lg", onclick: ctrl.onmeal() }
 						}, {
 							tag: "button",
 							children: ["会話"],
-							attrs: { type: "button", className: "btn btn-info btn-lg" }
+							attrs: { type: "button", className: "btn btn-info btn-lg", onclick: ctrl.ontalk() }
 						}, {
 							tag: "button",
 							children: ["見つめる"],
-							attrs: { type: "button", className: "btn btn-primary btn-lg" }
+							attrs: { type: "button", className: "btn btn-primary btn-lg", onclick: ctrl.onwatch() }
 						}],
 						attrs: { className: "panel-body" }
 					}],
