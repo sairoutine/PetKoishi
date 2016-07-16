@@ -1,0 +1,8 @@
+{
+	"status": "success",
+	"version": 1,
+	"error_code": 0,
+	"response": {
+		"rule": "ルール1\nルール2\nルール3"
+	}
+}
