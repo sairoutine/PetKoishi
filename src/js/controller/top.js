@@ -2,6 +2,7 @@
 var m = require('mithril');
 
 var config = require('../config');
+var Character = require('../model/character');
 
 var Controller = function() {
 	var self = this;
@@ -21,6 +22,7 @@ var Controller = function() {
 	// 読み込んだ画像数
 	self.loaded_image_num = 0;
 
+	self.character = new Character();
 	// 名前
 	self.name = "こいし";
 	// セリフ
