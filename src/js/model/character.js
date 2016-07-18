@@ -1,9 +1,15 @@
 'use strict';
 
+var TWEEN = require('tween');
 var config = require('../config');
 
 var Model = function (ctrl) {
 	var self = this;
+
+	self.x = 0;
+	self.y = 50;
+
+	self.is_animating = false;
 
 	// 名前
 	self.name = "こいし";
@@ -35,6 +41,10 @@ Model.prototype.meal = function() {
 	else {
 		// 親愛度が上昇
 		self.plus_love(5);
+	}
+
+	if (self.love_status === "normal") { // TODO:
+		self.move_love();
 	}
 
 	// Game Over
@@ -130,5 +140,24 @@ Model.prototype.choice_array = function(array) {
 };
 
 
+Model.prototype.move_love = function() {
+	var self = this;
+
+	if(self.is_animating) return;
+
+	self.is_animating = true;
+
+	var down = new TWEEN.Tween(self)
+		.easing(TWEEN.Easing.Quartic.Out)
+		.to({ y: self.y + 20 }, 500);
+	var up = new TWEEN.Tween(self)
+		.easing(TWEEN.Easing.Quartic.Out)
+		.to({ y: self.y }, 500)
+		.onComplete(function() {
+			self.is_animating = false;
+		});
+	down.chain(up)
+		.start();
+};
 
 module.exports = Model;

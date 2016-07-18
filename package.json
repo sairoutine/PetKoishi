@@ -25,6 +25,7 @@
   },
   "dependencies": {
     "http-server": "^0.9.0",
-    "mithril": "^0.2.5"
+    "mithril": "^0.2.5",
+    "tween": "^0.9.0"
   }
 }

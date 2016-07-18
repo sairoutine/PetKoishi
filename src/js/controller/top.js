@@ -1,5 +1,6 @@
 'use strict';
 var m = require('mithril');
+var TWEEN = require('tween');
 
 var config = require('../config');
 var Character = require('../model/character');
@@ -70,10 +71,11 @@ Controller.prototype.updateCanvas = function () {
 		// キャラ描画
 		var chara = self.images[self.character.face];
 		if (chara) {
-			self.ctx.drawImage(chara, 0, 50, chara.width * 0.5, chara.height * 0.5);
+			self.ctx.drawImage(chara, self.character.x, self.character.y, chara.width * 0.5, chara.height * 0.5);
 		}
 	}
 
+	TWEEN.update();
 	self.requestID = requestAnimationFrame(self.updateCanvas.bind(self));
 };
 Controller.prototype.onunload = function(e) {
