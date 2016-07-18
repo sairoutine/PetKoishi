@@ -27,8 +27,15 @@ Model.prototype.meal = function() {
 	var self = this;
 	var ctrl = this.ctrl;
 
-	// 親愛度が減少
-	self.minus_love(1);
+	// ノーマル以下の場合
+	if(self.love < 10) {
+		// 親愛度が減少
+		self.minus_love(1);
+	}
+	else {
+		// 親愛度が上昇
+		self.plus_love(5);
+	}
 
 	// Game Over
 	if (self.love_status === "worst") {
@@ -48,6 +55,12 @@ Model.prototype.talk = function() {
 
 	// 親愛度が上昇
 	self.plus_love(1);
+
+	if(self.love_status === "good" && self.love === 10) {
+		self.face ="chara_odoroki";
+		ctrl.printMessage("えっ、お姉ちゃんの知り合いなの？\nなーんだ");
+		return;
+	}
 
 	self.action("talk", self.love_status);
 };
