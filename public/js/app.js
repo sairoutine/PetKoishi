@@ -2267,8 +2267,52 @@ Config.images = {
 	chara_ikari: "./img/chara/ikari.png",
 	chara_komaru: "./img/chara/komaru.png",
 	chara_naku: "./img/chara/naku.png",
-	chara_tsuyoki: "./img/chara/tsuyoki.png"
+	chara_tsuyoki: "./img/chara/tsuyoki.png",
+	chara_naki_komari: "./img/chara/naki_komari.png",
+	chara_naki_tojiru: "./img/chara/naki_tojiru.png",
+	chara_odoroki: "./img/chara/odoroki.png",
+	chara_normal: "./img/chara/normal.png",
+	chara_yorokobi: "./img/chara/yorokobi.png",
+	chara_smile: "./img/chara/smile.png",
+	chara_naku_smile: "./img/chara/naku_smile.png",
+	chara_yoyuu: "./img/chara/yoyuu.png"
 };
+
+// セリフのタイポグラフィスピード
+Config.serif_speed = 10;
+
+Config.serif = {
+	meal: {},
+	talk: {},
+	watch: {}
+};
+
+// ご飯
+Config.serif.meal.best = [{ face: "chara_yorokobi", serif: "おいしーい♡" }, { face: "chara_yorokobi", serif: "いっしょにたべよー？" }];
+Config.serif.meal.better = [{ face: "chara_naku_smile", serif: "やーん、お魚きらーい" }, { face: "chara_normal", serif: "おなかいっぱーい" }];
+Config.serif.meal.good = [{ face: "chara_yorokobi", serif: "お団子ー！\nおいしーい" }, { face: "chara_smile", serif: "お煎餅おいしい(ポリポリ)" }];
+Config.serif.meal.normal = [{ face: "chara_tsuyoki", serif: "いらない。\n(信用されていないようだ)" }];
+Config.serif.meal.bad = [{ face: "chara_tsuyoki", serif: "・・・・・・・" }];
+//Config.serif.meal.worse = [];
+//Config.serif.meal.worst = [];
+
+// 会話
+Config.serif.talk.best = [{ face: "chara_yorokobi", serif: "きゃー" }];
+Config.serif.talk.better = [{ face: "chara_yorokobi", serif: "わーい" }, { face: "chara_yorokobi", serif: "うしろから……\nばぁーっ！" }];
+Config.serif.talk.good = [{ face: "chara_normal", serif: "うちのおくうは忘れっぽいの" }, { face: "chara_normal", serif: "うちのお燐は怨霊と会話できるんだよ" }, { face: "chara_normal", serif: "はやくおうち帰りたーい" }, { face: "chara_normal", serif: "ひまー" }, { face: "chara_normal", serif: "つまんなーい" }];
+Config.serif.talk.normal = [{ face: "chara_naku", serif: "お姉ちゃんのところにかえしてよぅ……" }, { face: "chara_naku", serif: "グスン……" }, { face: "chara_naki_komari", serif: "あなた、だれ？" }, { face: "chara_naki_tojiru", serif: "おねえちゃん……" }];
+Config.serif.talk.bad = [{ face: "chara_tsuyoki", serif: "・・・・・・・" }];
+//Config.serif.talk.worse = [];
+//Config.serif.talk.worst = [];
+
+// 見つめる
+Config.serif.watch.best = [{ face: "chara_yorokobi", serif: "♡\n(ゴキゲンみたいだ)" }];
+Config.serif.watch.better = [{ face: "chara_yoyuu", serif: "♪\n(ゴキゲンみたいだ)" }];
+Config.serif.watch.good = [{ face: "chara_normal", serif: "・・・・・・\nどうしたの？" }];
+Config.serif.watch.normal = [{ face: "chara_komaru", serif: "・・・・・・？\n(気味悪がられている)" }];
+Config.serif.watch.bad = [{ face: "chara_tsuyoki", serif: "・・・・・・・" }];
+//Config.serif.watch.worse = [];
+//Config.serif.watch.worst = [];
 
 module.exports = Config;
 },{}],5:[function(require,module,exports){
@@ -2291,19 +2335,22 @@ var Controller = function Controller() {
 	// requrestAnimationFrame のキャンセル用
 	self.requestID = null;
 
+	// セリフの setTimeout のキャンセル用
+	self.timeoutID = null;
+
+	// ユーザーがボタン押下可能かどうか
+	self.can_action = true;
+
 	// 読み込んだ画像一覧
 	self.images = {};
 
 	// 読み込んだ画像数
 	self.loaded_image_num = 0;
 
-	self.character = new Character();
-	// 名前
-	self.name = "こいし";
-	// セリフ
-	self.serif = "・・・・・・";
-	// 表情
-	self.face = "chara_ikari";
+	self.character = new Character(self);
+
+	// セリフ欄(最初のセリフ)
+	self.serif = self.character.default_serif;
 
 	// 画像のプリロード開始
 	self._load_images();
@@ -2333,10 +2380,14 @@ Controller.prototype.updateCanvas = function () {
 
 	// 画像の読み込みがすべて完了したかどうか
 	if (self.loaded_image_num >= Object.keys(config.images).length) {
+		// 背景描画
 		self.ctx.drawImage(self.images['bg'], 0, 0);
 
-		var chara = self.images[self.face];
-		self.ctx.drawImage(chara, 0, -150, chara.width, chara.height, 0, 0, chara.width * 0.5, chara.height * 0.5);
+		// キャラ描画
+		var chara = self.images[self.character.face];
+		if (chara) {
+			self.ctx.drawImage(chara, 0, -150, chara.width, chara.height, 0, 0, chara.width * 0.5, chara.height * 0.5);
+		}
 	}
 
 	self.requestID = requestAnimationFrame(self.updateCanvas.bind(self));
@@ -2350,41 +2401,189 @@ Controller.prototype.onunload = function (e) {
 Controller.prototype.onmeal = function () {
 	var self = this;
 	return function (e) {
-		self.face = "chara_tsuyoki";
-		self.serif = "いらない(信用されていないようだ)";
+		self.character.meal();
 	};
 };
 Controller.prototype.ontalk = function () {
 	var self = this;
 
 	return function (e) {
-		// 親愛度が上昇
-		self.character.love++;
-
-		self.face = "chara_naku";
-		self.serif = "おねえちゃんのところに帰してよう・・・";
+		self.character.talk();
 	};
 };
 Controller.prototype.onwatch = function () {
 	var self = this;
 
 	return function (e) {
-		self.face = "chara_komaru";
-		self.serif = "・・・・・・？(困っているようだ)";
+		self.character.watch();
 	};
 };
+
+// テキストを1文字ずつパラパラと表示する
+Controller.prototype.printMessage = function (message) {
+	var self = this;
+
+	// 現在実行中のセリフをキャンセル
+	if (self.timeoutID !== null) {
+		clearTimeout(self.timeoutID);
+		self.timeoutID = null;
+	}
+
+	var char_list = message.split("");
+	var char_length = char_list.length;
+
+	var idx = 0;
+
+	// 表示されているセリフをクリア
+	self.serif = "";
+
+	var output = function output() {
+		if (idx >= char_length) return;
+
+		// タイポグラフィの速度
+		var speed = config.serif_speed;
+
+		var ch = char_list[idx];
+		idx++;
+
+		if (ch === "\n") {
+			speed += 1000;
+			self.serif = "";
+		} else {
+			self.serif = self.serif + ch;
+			m.redraw();
+		}
+
+		self.timeoutID = setTimeout(output, speed);
+	};
+	output();
+};
+
 module.exports = Controller;
 },{"../config":4,"../model/character":6,"mithril":1}],6:[function(require,module,exports){
 'use strict';
 
-var Model = function Model() {
+var config = require('../config');
+
+var Model = function Model(ctrl) {
 	var self = this;
 
+	// 名前
+	self.name = "こいし";
+
+	// 表情
+	self.face = "chara_ikari";
+
+	// 最初のセリフ
+	self.default_serif = "・・・・・・";
+
 	// 親愛度
-	self.love = 0;
+	self.love = 5;
+
+	// 親愛状態
+	self.love_status = "normal";
+
+	self.ctrl = ctrl;
 };
+
+Model.prototype.meal = function () {
+	var self = this;
+	var ctrl = this.ctrl;
+
+	// ノーマル以下の場合
+	if (self.love < 10) {
+		// 親愛度が減少
+		self.minus_love(1);
+	} else {
+		// 親愛度が上昇
+		self.plus_love(5);
+	}
+
+	// Game Over
+	if (self.love_status === "worst") {
+		ctrl.can_action = false;
+
+		self.face = "";
+		ctrl.printMessage("・・・・・・\n(倒れこんだきり、動かなくなった)\n(彼女はもう何日も何も食べていない)\n・・・・・・\n(彼女は二度と動かない)\n(GAME OVER)");
+		return;
+	}
+
+	self.action("meal", self.love_status);
+};
+
+Model.prototype.talk = function () {
+	var self = this;
+	var ctrl = this.ctrl;
+
+	// 親愛度が上昇
+	self.plus_love(1);
+
+	if (self.love_status === "good" && self.love === 10) {
+		self.face = "chara_odoroki";
+		ctrl.printMessage("えっ、お姉ちゃんの知り合いなの？\nなーんだ");
+		return;
+	}
+
+	self.action("talk", self.love_status);
+};
+
+Model.prototype.watch = function () {
+	var self = this;
+
+	self.action("watch", self.love_status);
+};
+
+Model.prototype.action = function (act, status) {
+	var self = this;
+
+	var actions_and_statuses = config.serif[act];
+	if (!actions_and_statuses) return;
+
+	var actions = actions_and_statuses[status];
+	if (!actions) return;
+
+	var action = self.choice_array(actions);
+
+	self.face = action.face;
+	self.ctrl.printMessage(action.serif);
+};
+
+Model.prototype.plus_love = function (num) {
+	this.love += num;
+
+	this.check_and_change_love_status();
+};
+
+Model.prototype.minus_love = function (num) {
+	this.love -= num;
+
+	this.check_and_change_love_status();
+};
+
+Model.prototype.check_and_change_love_status = function () {
+	var self = this;
+	if (50 <= self.love) {
+		self.love_status = "best";
+	} else if (30 <= self.love && self.love < 50) {
+		self.love_status = "better";
+	} else if (10 <= self.love && self.love < 30) {
+		self.love_status = "good";
+	} else if (0 <= self.love && self.love < 10) {
+		self.love_status = "normal";
+	} else if (-10 <= self.love && self.love < 0) {
+		self.love_status = "bad";
+	} else if (-30 <= self.love && self.love < -10) {
+		//self.love_status = "worse";
+	} else if (self.love < -30) {
+		self.love_status = "worst";
+	}
+};
+Model.prototype.choice_array = function (array) {
+	return array[Math.floor(Math.random() * array.length)];
+};
+
 module.exports = Model;
-},{}],7:[function(require,module,exports){
+},{"../config":4}],7:[function(require,module,exports){
 'use strict';
 
 module.exports = function (ctrl) {
@@ -2425,14 +2624,14 @@ module.exports = function (ctrl) {
 					tag: "div",
 					children: [{
 						tag: "div",
-						children: [ctrl.name],
+						children: [ctrl.character.name],
 						attrs: { className: "panel-heading" }
 					}, {
 						tag: "div",
 						children: [ctrl.serif],
 						attrs: { className: "panel-body" }
 					}],
-					attrs: { className: "panel panel-success" }
+					attrs: { className: "panel panel-primary" }
 				}],
 				attrs: { className: "row" }
 			}, {
@@ -2444,15 +2643,15 @@ module.exports = function (ctrl) {
 						children: [{
 							tag: "button",
 							children: ["ご飯"],
-							attrs: { type: "button", className: "btn btn-warning btn-lg", onclick: ctrl.onmeal() }
+							attrs: { type: "button", className: "btn btn-success btn-lg", onclick: ctrl.onmeal(), disabled: !ctrl.can_action }
 						}, {
 							tag: "button",
 							children: ["会話"],
-							attrs: { type: "button", className: "btn btn-info btn-lg", onclick: ctrl.ontalk() }
+							attrs: { type: "button", className: "btn btn-info btn-lg", onclick: ctrl.ontalk(), disabled: !ctrl.can_action }
 						}, {
 							tag: "button",
 							children: ["見つめる"],
-							attrs: { type: "button", className: "btn btn-primary btn-lg", onclick: ctrl.onwatch() }
+							attrs: { type: "button", className: "btn btn-danger btn-lg", onclick: ctrl.onwatch(), disabled: !ctrl.can_action }
 						}],
 						attrs: { className: "panel-body" }
 					}],
