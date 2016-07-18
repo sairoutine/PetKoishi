@@ -83,7 +83,7 @@ Controller.prototype.onmeal = function() {
 	var self = this;
 	return function(e) {
 		self.face = "chara_tsuyoki";
-		self.printMessage("いらない\n(信用されていないようだ)");
+		self.printMessage("いらない。\n(信用されていないようだ)");
 
 	};
 };
