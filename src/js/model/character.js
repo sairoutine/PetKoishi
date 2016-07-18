@@ -24,7 +24,7 @@ Model.prototype.meal = function() {
 	// 親愛度が減少
 	self.minus_love(1);
 
-	if (self.love < -1) {
+	if (self.love < -10) {
 		self.face ="";
 		ctrl.printMessage("・・・・・・\n(倒れこんだきり、動かなくなった)\n(彼女は二度と動かない)\n(GAME OVER)");
 		return;
