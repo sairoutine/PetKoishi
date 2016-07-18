@@ -16,6 +16,9 @@ var Controller = function() {
 	// requrestAnimationFrame のキャンセル用
 	self.requestID = null;
 
+	// セリフの setTimeout のキャンセル用
+	self.timeoutID = null;
+
 	// 読み込んだ画像一覧
 	self.images = {};
 
@@ -80,7 +83,7 @@ Controller.prototype.onmeal = function() {
 	var self = this;
 	return function(e) {
 		self.face = "chara_tsuyoki";
-		self.serif = "いらない(信用されていないようだ)";
+		self.printMessage("いらない\n(信用されていないようだ)");
 
 	};
 };
@@ -92,7 +95,7 @@ Controller.prototype.ontalk = function() {
 		self.character.love++;
 
 		self.face = "chara_naku";
-		self.serif = "おねえちゃんのところに帰してよう・・・";
+		self.printMessage("お姉ちゃんのところにかえしてよぅ……");
 	};
 };
 Controller.prototype.onwatch = function() {
@@ -100,7 +103,51 @@ Controller.prototype.onwatch = function() {
 
 	return function(e) {
 		self.face = "chara_komaru";
-		self.serif = "・・・・・・？(困っているようだ)";
+		self.printMessage("・・・・・・？\n(困っているようだ)");
 	};
 };
+
+// テキストを1文字ずつパラパラと表示する
+Controller.prototype.printMessage = function (message) {
+	var self = this;
+
+	// 現在実行中のセリフをキャンセル
+	if(self.timeoutID !== null) {
+		clearTimeout(self.timeoutID);
+		self.timeoutID = null;
+	}
+
+	var char_list = message.split("");
+	var char_length = char_list.length;
+
+	var idx = 0;
+
+	// 表示されているセリフをクリア
+	self.serif = "";
+
+	var output = function() {
+		if (idx >= char_length) return;
+
+		// タイポグラフィの速度
+		var speed = config.serif_speed;
+
+		var ch = char_list[idx];
+		idx++;
+
+
+		if (ch === "\n") {
+			speed += 1000;
+			self.serif = "";
+		}
+		else {
+			self.serif = self.serif + ch;
+			m.redraw();
+		}
+
+		self.timeoutID = setTimeout(output, speed);
+	};
+	output();
+};
+
+
 module.exports = Controller;

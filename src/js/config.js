@@ -11,4 +11,6 @@ Config.images = {
 	chara_tsuyoki: "./img/chara/tsuyoki.png",
 };
 
+Config.serif_speed = 10;
+
 module.exports = Config;
