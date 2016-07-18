@@ -140,6 +140,16 @@ Model.prototype.choice_array = function(array) {
 };
 
 
+Model.prototype.updateCanvas = function() {
+	var self = this;
+
+	// キャラ描画
+	var chara = self.ctrl.images[self.face];
+	if (chara) {
+		self.ctrl.ctx.drawImage(chara, self.x, self.y, chara.width * 0.5, chara.height * 0.5);
+	}
+};
+
 Model.prototype.move_love = function() {
 	var self = this;
 

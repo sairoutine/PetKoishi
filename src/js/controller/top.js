@@ -68,14 +68,10 @@ Controller.prototype.updateCanvas = function () {
 			0
 		);
 
-		// キャラ描画
-		var chara = self.images[self.character.face];
-		if (chara) {
-			self.ctx.drawImage(chara, self.character.x, self.character.y, chara.width * 0.5, chara.height * 0.5);
-		}
+		self.character.updateCanvas();
+		TWEEN.update();
 	}
 
-	TWEEN.update();
 	self.requestID = requestAnimationFrame(self.updateCanvas.bind(self));
 };
 Controller.prototype.onunload = function(e) {
