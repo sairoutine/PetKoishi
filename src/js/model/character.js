@@ -14,6 +14,9 @@ var Model = function (ctrl) {
 	// 親愛度
 	self.love = 0;
 
+	// 親愛状態
+	self.love_status = "normal";
+
 	self.ctrl = ctrl;
 };
 
@@ -24,7 +27,7 @@ Model.prototype.meal = function() {
 	// 親愛度が減少
 	self.minus_love(1);
 
-	if (self.love < -10) {
+	if (self.love_status === "worst") {
 		self.face ="";
 		ctrl.printMessage("・・・・・・\n(倒れこんだきり、動かなくなった)\n(彼女は二度と動かない)\n(GAME OVER)");
 		return;
@@ -56,10 +59,38 @@ Model.prototype.watch = function() {
 Model.prototype.plus_love = function(num) {
 	this.love += num;
 
+	this.check_and_change_love_status();
 };
 
 Model.prototype.minus_love = function(num) {
 	this.love -= num;
+
+	this.check_and_change_love_status();
+};
+
+Model.prototype.check_and_change_love_status = function() {
+	var self = this;
+	if(50 <= self.love) {
+		self.love_status = "best";
+	}
+	else if(30 <= self.love && self.love < 50) {
+		self.love_status = "better";
+	}
+	else if(10 <= self.love && self.love < 30) {
+		self.love_status = "good";
+	}
+	else if(0 <= self.love && self.love < 10) {
+		self.love_status = "normal";
+	}
+	else if(-10 <= self.love && self.love < 0) {
+		self.love_status = "bad";
+	}
+	else if(-30 <= self.love && self.love < -10) {
+		//self.love_status = "worse";
+	}
+	else if(self.love < -30) {
+		self.love_status = "worst";
+	}
 };
 
 module.exports = Model;
