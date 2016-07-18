@@ -5,6 +5,7 @@ var Config = {};
 // ゲームに必要な画像一覧
 Config.images = {
 	bg:                "./img/haikyo.jpg",
+	heart:             "./img/heart.gif",
 	chara_ikari:       "./img/chara/ikari.png",
 	chara_komaru:      "./img/chara/komaru.png",
 	chara_naku:        "./img/chara/naku.png",

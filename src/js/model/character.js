@@ -11,6 +11,9 @@ var Model = function (ctrl) {
 
 	self.is_animating = false;
 
+	// ハートオプション(move_love用)
+	self.heart = null;
+
 	// 名前
 	self.name = "こいし";
 
@@ -43,7 +46,7 @@ Model.prototype.meal = function() {
 		self.plus_love(5);
 	}
 
-	if (self.love_status === "normal") { // TODO:
+	if (self.love_status === "best") {
 		self.move_love();
 	}
 
@@ -148,6 +151,13 @@ Model.prototype.updateCanvas = function() {
 	if (chara) {
 		self.ctrl.ctx.drawImage(chara, self.x, self.y, chara.width * 0.5, chara.height * 0.5);
 	}
+
+	// ハート描画(move_love用)
+	if (self.heart) {
+		var heart = self.ctrl.images["heart"];
+		self.ctrl.ctx.drawImage(heart, self.heart.x, self.heart.y, heart.width * 0.25, heart.height * 0.25);
+	}
+
 };
 
 Model.prototype.move_love = function() {
@@ -157,6 +167,7 @@ Model.prototype.move_love = function() {
 
 	self.is_animating = true;
 
+	// キャラ動く
 	var down = new TWEEN.Tween(self)
 		.easing(TWEEN.Easing.Quartic.Out)
 		.to({ y: self.y + 20 }, 500);
@@ -167,6 +178,17 @@ Model.prototype.move_love = function() {
 			self.is_animating = false;
 		});
 	down.chain(up)
+		.start();
+
+	// ハート動く
+	self.heart = {x: self.x + 200, y: self.y};
+
+	new TWEEN.Tween(self.heart)
+		.easing(TWEEN.Easing.Quartic.Out)
+		.to({ x: self.heart.x + 15, y: self.heart.y - 15 }, 1000)
+		.onComplete(function() {
+			self.heart = null;
+		})
 		.start();
 };
 
