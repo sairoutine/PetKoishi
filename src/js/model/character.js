@@ -35,7 +35,7 @@ Model.prototype.meal = function() {
 		ctrl.can_action = false;
 
 		self.face ="";
-		ctrl.printMessage("・・・・・・\n(倒れこんだきり、動かなくなった)\n(彼女は二度と動かない)\n(GAME OVER)");
+		ctrl.printMessage("・・・・・・\n(倒れこんだきり、動かなくなった)\n(彼女はもう何日も何も食べていない)\n・・・・・・\n(彼女は二度と動かない)\n(GAME OVER)");
 		return;
 	}
 
@@ -58,10 +58,16 @@ Model.prototype.watch = function() {
 	self.action("watch", self.love_status);
 };
 
+
+
+
 Model.prototype.action = function(act, status) {
 	var self = this;
 
-	var actions = config.serif[act][status];
+	var actions_and_statuses = config.serif[act];
+	if(!actions_and_statuses) return;
+
+	var actions = actions_and_statuses[status];
 	if(!actions) return;
 
 	var action = self.choice_array(actions);
