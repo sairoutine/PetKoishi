@@ -1,7 +1,7 @@
 'use strict';
 module.exports = function(ctrl) {
 	return <div>
-		<nav class="navbar navbar-inverse navbar-fixed-top">
+		<nav class="navbar navbar-inverse">
 			<div class="container-fluid">
 				<div class="navbar-header">
 					<span class="navbar-brand">こいしちゃんを監禁する</span>
@@ -9,7 +9,7 @@ module.exports = function(ctrl) {
 			</div>
 		</nav>
 
-		<div class="container-fluid" style="padding-top:80px">
+		<div class="container-fluid">
 			<div class="row">
 			<canvas id="main" width="320" height="320" style="border:1px solid black; width:320px; height:320px;" config={ function(elm, isInitialized, context) {
 				if (isInitialized) return;

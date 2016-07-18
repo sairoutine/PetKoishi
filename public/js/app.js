@@ -2604,7 +2604,7 @@ module.exports = function (ctrl) {
 				}],
 				attrs: { className: "container-fluid" }
 			}],
-			attrs: { className: "navbar navbar-inverse navbar-fixed-top" }
+			attrs: { className: "navbar navbar-inverse" }
 		}, {
 			tag: "div",
 			children: [{
@@ -2659,7 +2659,7 @@ module.exports = function (ctrl) {
 				}],
 				attrs: { className: "row" }
 			}],
-			attrs: { className: "container-fluid", style: "padding-top:80px" }
+			attrs: { className: "container-fluid" }
 		}]
 	};
 };
