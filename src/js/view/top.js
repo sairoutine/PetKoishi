@@ -20,7 +20,7 @@ module.exports = function(ctrl) {
 			<div class="row">
 				<div class="panel panel-primary">
 					<div class="panel-heading">
-						{ ctrl.name }
+						{ ctrl.character.name }
 					</div>
 					<div class="panel-body">
 						{ ctrl.serif }

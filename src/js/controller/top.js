@@ -25,13 +25,10 @@ var Controller = function() {
 	// 読み込んだ画像数
 	self.loaded_image_num = 0;
 
-	self.character = new Character();
-	// 名前
-	self.name = "こいし";
-	// セリフ
-	self.serif = "・・・・・・";
-	// 表情
-	self.face = "chara_ikari";
+	self.character = new Character(self);
+
+	// セリフ欄(最初のセリフ)
+	self.serif = self.character.default_serif;
 
 	// 画像のプリロード開始
 	self._load_images();
@@ -61,12 +58,14 @@ Controller.prototype.updateCanvas = function () {
 
 	// 画像の読み込みがすべて完了したかどうか
 	if(self.loaded_image_num >= Object.keys(config.images).length) {
+		// 背景描画
 		self.ctx.drawImage(self.images['bg'],
 			0,
 			0
 		);
 
-		var chara = self.images[self.face];
+		// キャラ描画
+		var chara = self.images[self.character.face];
 		self.ctx.drawImage(chara, 0, -150, chara.width, chara.height, 0, 0, chara.width * 0.5, chara.height * 0.5);
 
 	}
@@ -82,28 +81,21 @@ Controller.prototype.onunload = function(e) {
 Controller.prototype.onmeal = function() {
 	var self = this;
 	return function(e) {
-		self.face = "chara_tsuyoki";
-		self.printMessage("いらない。\n(信用されていないようだ)");
-
+		self.character.meal();
 	};
 };
 Controller.prototype.ontalk = function() {
 	var self = this;
 
 	return function(e) {
-		// 親愛度が上昇
-		self.character.love++;
-
-		self.face = "chara_naku";
-		self.printMessage("お姉ちゃんのところにかえしてよぅ……");
+		self.character.talk();
 	};
 };
 Controller.prototype.onwatch = function() {
 	var self = this;
 
 	return function(e) {
-		self.face = "chara_komaru";
-		self.printMessage("・・・・・・？\n(困っているようだ)");
+		self.character.watch();
 	};
 };
 
