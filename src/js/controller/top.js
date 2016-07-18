@@ -70,7 +70,7 @@ Controller.prototype.updateCanvas = function () {
 		// キャラ描画
 		var chara = self.images[self.character.face];
 		if (chara) {
-			self.ctx.drawImage(chara, 0, 0, chara.width, chara.height, 0, 0, chara.width * 0.5, chara.height * 0.5);
+			self.ctx.drawImage(chara, 0, 50, chara.width * 0.5, chara.height * 0.5);
 		}
 	}
 
