@@ -19,6 +19,9 @@ var Controller = function() {
 	// セリフの setTimeout のキャンセル用
 	self.timeoutID = null;
 
+	// ユーザーがボタン押下可能かどうか
+	self.can_action = true;
+
 	// 読み込んだ画像一覧
 	self.images = {};
 

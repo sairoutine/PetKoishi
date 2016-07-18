@@ -1,4 +1,7 @@
 'use strict';
+
+var config = require('../config');
+
 var Model = function (ctrl) {
 	var self = this;
 
@@ -12,7 +15,7 @@ var Model = function (ctrl) {
 	self.default_serif = "・・・・・・";
 
 	// 親愛度
-	self.love = 0;
+	self.love = 5;
 
 	// 親愛状態
 	self.love_status = "normal";
@@ -27,14 +30,16 @@ Model.prototype.meal = function() {
 	// 親愛度が減少
 	self.minus_love(1);
 
+	// Game Over
 	if (self.love_status === "worst") {
+		ctrl.can_action = false;
+
 		self.face ="";
 		ctrl.printMessage("・・・・・・\n(倒れこんだきり、動かなくなった)\n(彼女は二度と動かない)\n(GAME OVER)");
 		return;
 	}
 
-	self.face = "chara_tsuyoki";
-	ctrl.printMessage("いらない。\n(信用されていないようだ)");
+	self.action("meal", self.love_status);
 };
 
 Model.prototype.talk = function() {
@@ -44,16 +49,25 @@ Model.prototype.talk = function() {
 	// 親愛度が上昇
 	self.plus_love(1);
 
-	self.face = "chara_naku";
-	ctrl.printMessage("お姉ちゃんのところにかえしてよぅ……");
+	self.action("talk", self.love_status);
 };
 
 Model.prototype.watch = function() {
 	var self = this;
-	var ctrl = this.ctrl;
 
-	self.face = "chara_komaru";
-	ctrl.printMessage("・・・・・・？\n(気味悪がられている)");
+	self.action("watch", self.love_status);
+};
+
+Model.prototype.action = function(act, status) {
+	var self = this;
+
+	var actions = config.serif[act][status];
+	if(!actions) return;
+
+	var action = self.choice_array(actions);
+
+	self.face = action.face;
+	self.ctrl.printMessage(action.serif);
 };
 
 Model.prototype.plus_love = function(num) {
@@ -92,5 +106,10 @@ Model.prototype.check_and_change_love_status = function() {
 		self.love_status = "worst";
 	}
 };
+Model.prototype.choice_array = function(array) {
+	return array[Math.floor(Math.random() * array.length)];
+};
+
+
 
 module.exports = Model;
